@@ -1,0 +1,53 @@
+services:
+  bet_maker:
+    build: ./bet_maker
+    ports:
+      - ${BET_MAKER_PORT}:${BET_MAKER_PORT}
+    volumes:
+      - ./bet_maker:/app
+    depends_on:
+      - redis_bet_maker
+    env_file: 
+      - ./bet_maker/.env
+    networks:
+      - bet_network
+
+  line_provider:
+    build: ./line_provider
+    ports:
+      - ${LINE_PROVIDER_PORT}:${LINE_PROVIDER_PORT}
+    volumes:
+      - ./line_provider:/app
+    depends_on:
+      - redis_line_provider
+    env_file:
+      - ./line_provider/.env
+    networks:
+      - bet_network
+
+  redis_bet_maker:
+    image: redis:alpine
+    container_name: redis_bet_maker
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_bet_maker_data:/data
+    networks:
+      - bet_network
+
+  redis_line_provider:
+    image: redis:alpine
+    container_name: redis_line_provider
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_line_provider_data:/data
+    networks:
+      - bet_network
+
+volumes:
+  redis_bet_maker_data:
+  redis_line_provider_data:
+
+networks:
+  bet_network:
